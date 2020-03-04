@@ -4,7 +4,7 @@
 
 fatal() {
   touch "$HOME"/.ssh/telegram_ssh_log
-  echo "$(date) | $*" # > "$HOME"/.ssh/telegram_ssh_log
+  echo "$(date) | $*"  > "$HOME"/.ssh/telegram_ssh_log
   exit 0
   # so we don't warn the hacker if there's one
 }
