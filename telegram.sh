@@ -41,7 +41,7 @@ send() {
   # nossh & local arguments (look above)
   # comment this part if you don't want notification from local login (w/o SSH)
   else
-    INFOREQ="$(curl "http://ip-api.com/line/$IP?fields=status,message,continent,country,regionName,city,zip,isp,as,mobile,proxy,hosting,query")"
+    INFOREQ="$(curl -s "http://ip-api.com/line/$IP?fields=status,message,continent,country,regionName,city,zip,isp,as,mobile,proxy,hosting,query")"
     STATUS="$(echo "$INFOREQ" | sed "1q;d")"
 
     if [ ! "$STATUS" = "succes" ]; then
