@@ -1,0 +1,13 @@
+Service]
+Description=Bot
+After=network.target
+StartLimitIntervalSec=0
+Type=simple
+Restart=always
+RestartSec=1
+User=jusdepatate
+ExecStart=/usr/bin/python3 /home/jusdepatate/bot.py
+ExecStop=/bin/kill "$(/bin/pidof /usr/bin/python3 /home/jusdepatate/bot.py)"
+
+[Install]
+WantedBy=multi-user.target
