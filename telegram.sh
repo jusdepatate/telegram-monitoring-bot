@@ -18,6 +18,9 @@ CHAT_ID=""
 LOCAL_IP="10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 # Local IPs
 
+TRUSTED_IP=""
+# IPs that will do a notification by default but won't check any informations online
+
 if [ -z "$BOT_KEY" ]; then
   fatal "No bot API key"
 elif [ -z "$CHAT_ID" ]; then
@@ -37,9 +40,11 @@ send() {
       MESSAGE="Connection to $(whoami) from local ($IP) on $(tty) ($(hostname))"
     elif [ "$1" = "nossh" ]; then
       MESSAGE="Login to $(whoami) from local on $(tty) ($(hostname))"
+    elif [ "$1" = "trusted" ]; then
+      MESSAGE="Login to $(whoami) from a trusted IP ($IP) on $(tty) ($(hostname))"
     fi
-  # nossh & local arguments (look above)
-  # comment this part if you don't want notification from local login (w/o SSH)
+  # nossh, local & trusted arguments (look above)
+  # comment this part if you don't want notification from local login (w/o SSH) or login from trusted IP
   else
     INFOREQ="$(curl -s "http://ip-api.com/line/$IP?fields=status,message,continent,country,regionName,city,zip,isp,as,mobile,proxy,hosting,query")"
     STATUS="$(echo "$INFOREQ" | sed "1q;d")"
@@ -63,6 +68,8 @@ send() {
         SPECIAL=" - VPN/TOR/Proxy)"
       elif [ "$HOSTING" = "true" ]; then
         SPECIAL=" - Hosting company)"
+      else
+        SPECIAL=")"
       fi
 
       MESSAGE="Connection to $(whoami) on $TTY ($(hostname)) from $CITY, $REGION ($CITY_ZIP), $COUNTRY ($CONTINENT) using IP $IP ($AS - $ISP$SPECIAL"
@@ -96,6 +103,9 @@ if [ -z "$IP" ]; then
 elif [ "$(echo "$IP" | grepcidr "$LOCAL_IP")" ]; then
   # if ssh from local
   send local
+elif [ "$(echo "$IP" | grepcidr "$TRUSTED_IP")" ]; then
+  # if ssh from trusted IP
+  send trusted
 else
   # if ssh from external IP
   send
