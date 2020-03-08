@@ -20,9 +20,9 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['status'])
 def send_welcome(message):
-	RAM = str(round(getattr(psutil.virtual_memory(), 'used') / getattr(psutil.virtual_memory(), 'total') * 100))
-	CPU = str(round(psutil.cpu_percent(interval=None, percpu=False) * 10))
-	DISK = str(round(psutil.disk_usage(psutil.disk_partitions()[0].mountpoint).percent))
+	ram = str(round(getattr(psutil.virtual_memory(), 'used') / getattr(psutil.virtual_memory(), 'total') * 100))
+	cpu = str(round(psutil.cpu_percent(interval=None, percpu=False) * 10))
+	disk = str(round(psutil.disk_usage(psutil.disk_partitions()[0].mountpoint).percent))
 
 	sent = time.monotonic()
 	msg = bot.reply_to(message, "Ping-pong!")
@@ -31,9 +31,9 @@ def send_welcome(message):
 
 	bot.edit_message_text(
 		"Ping: " + str(ping) + "ms\n"
-		"RAM: " + RAM + "%\n"
-		"CPU: " + CPU + "% (/cpu for more)\n"
-		"Disk: " + DISK + "% (/disk for more)",
+		"RAM: " + ram + "%\n"
+		"CPU: " + cpu + "% (/cpu for more)\n"
+		"Disk: " + disk + "% (/disk for more)",
 		message_id=msg.message_id, chat_id=msg.chat.id)
 	# here we send a message, then edit it to get """"ping""""
 	# we also give RAM/CPU/Disk (first partition) usage from psutil
@@ -41,14 +41,14 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['cpu'])
 def cpu_usage(message):
-	i=0
-	msg=""
+	i = 0
+	msg = ""
 	while True:
 		try:
 			cpup = psutil.cpu_percent(percpu=True)
 
 			msg += "CPU "+str(i+1)+": "+str(cpup[i] * 10)+"\n"
-			i+=1
+			i += 1
 		except IndexError:
 			break
 	bot.reply_to(message, msg)
@@ -58,20 +58,20 @@ def cpu_usage(message):
 @bot.message_handler(commands=['disk'])
 def disk_usage(message):
 	partitions = psutil.disk_partitions()
-	format = "{}\t{}\t{}\t{}%\n"
-	msg = format.format("Disk", "Fs", "Mountpoint", "Av.Space in ")
+	fmt = "{}\t{}\t{}\t{}%\n"
+	msg = fmt.format("Disk", "Fs", "Mountpoint", "Av.Space in ")
 	# Only show a couple of different types of devices, for brevity.
-	i=0
+	i = 0
 	while True:
 		try:
 			partition = partitions[i]
 			if partition.fstype == "squashfs":
-				i+=1
+				i += 1
 				# ignore squashfs
 			else:
-				msg += format.format(partition.device, partition.fstype, partition.mountpoint, psutil.disk_usage(partition.mountpoint).percent)
+				msg += fmt.format(partition.device, partition.fstype, partition.mountpoint, psutil.disk_usage(partition.mountpoint).percent)
 				# add drive (usually starts by '/dev/'), filesystem, mountpoint and disk usage in %
-				i+=1
+				i += 1
 		except IndexError:
 			break
 	# i know you hate that way to do <3
